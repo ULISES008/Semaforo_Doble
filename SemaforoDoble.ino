@@ -16,11 +16,6 @@ int buttonOn = 7;
 int t = 3000;
 int tPreventiva = 2000;
 int tRojoVerde = 1000;
-//program time:
-int mode = 6;
-//+, -, time in sec:
-int menosT = 5;
-int masT = 4;
 
 void setup()
 {
@@ -35,10 +30,6 @@ void setup()
   // switch:
   attachInterrupt(digitalPinToInterrupt(buttonOff),stopAll,HIGH);
   pinMode(buttonOn, INPUT);
-  // switch time:
-  pinMode(mode, INPUT);
-  pinMode(menosT, INPUT);
-  pinMode(masT, INPUT);
 }
 
 void loop()
@@ -88,8 +79,6 @@ void stopAll(){
   digitalWrite(red2, HIGH);
   digitalWrite(yellow2, HIGH);
   while (digitalRead(buttonOn) != HIGH){
-    //Change tiem mode
-    if (digitalRead(mode) == HIGH){}
   }
   digitalWrite(green1, LOW);
   digitalWrite(red1, LOW);
