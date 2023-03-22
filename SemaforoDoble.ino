@@ -17,13 +17,18 @@ int t = 3000;
 int tPreventiva = 2000;
 int tRojoVerde = 1000;
 //program time:
-int mode = 6;
+int estadoMasT = 0;
+int estadoMenosT = 0;
+int estadoAnteriorMasT = 0;
+int estadoAnteriorMenosT = 0;
 //+, -, time in sec:
 int menosT = 5;
 int masT = 4;
 
 void setup()
 {
+  Serial.begin(9600);
+  
   //Semaforo 1:
   pinMode(green1, OUTPUT);
   pinMode(yellow1, OUTPUT);
@@ -36,7 +41,6 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(buttonOff),stopAll,HIGH);
   pinMode(buttonOn, INPUT);
   // switch time:
-  pinMode(mode, INPUT);
   pinMode(menosT, INPUT);
   pinMode(masT, INPUT);
 }
@@ -44,7 +48,6 @@ void setup()
 void loop()
 {
   changeLights();
-  
 }
 
 void changeLights(){
@@ -89,7 +92,35 @@ void stopAll(){
   digitalWrite(yellow2, HIGH);
   while (digitalRead(buttonOn) != HIGH){
     //Change tiem mode
-    if (digitalRead(mode) == HIGH){}
+    Serial.println(t);
+    
+    estadoMasT = digitalRead(masT);
+    estadoMenosT = digitalRead(menosT);
+    
+    if ((estadoMasT == HIGH) && (estadoAnteriorMasT == LOW)){
+      if (t < 7000){            //Cambiat tiempo
+        t=t+1000;            //Cambiat tiempo
+      }
+      else{
+        t=1000;            //Cambiat tiempo
+      }
+      delay(20);
+    }
+    else if ((estadoMenosT == HIGH) && (estadoAnteriorMenosT == LOW)){
+      if (t > 1000){            //Cambiat tiempo
+        t=t-1000;            //Cambiat tiempo
+      }
+      else{
+        t=7000;            //Cambiat tiempo
+      }
+      delay(1000);
+    }
+    
+    estadoAnteriorMasT = estadoMasT;
+    estadoAnteriorMenosT = estadoMenosT;
+    
+    
+    
   }
   digitalWrite(green1, LOW);
   digitalWrite(red1, LOW);
