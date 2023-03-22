@@ -22,8 +22,8 @@ int estadoMenosT = 0;
 int estadoAnteriorMasT = 0;
 int estadoAnteriorMenosT = 0;
 //+, -, time in sec:
-int menosT = 5;
-int masT = 4;
+int menosT = 6;
+int masT = 5;
 
 void setup()
 {
@@ -113,7 +113,7 @@ void stopAll(){
       else{
         t=7000;            //Cambiat tiempo
       }
-      delay(1000);
+      delay(20);
     }
     
     estadoAnteriorMasT = estadoMasT;
