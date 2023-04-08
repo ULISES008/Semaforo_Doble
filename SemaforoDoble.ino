@@ -91,9 +91,9 @@ void stopAll(){
   digitalWrite(red2, HIGH);
   digitalWrite(yellow2, HIGH);
   while (digitalRead(buttonOn) != HIGH){
-    //Change tiem mode
+    //Change time mode
     Serial.println(t);
-    
+
     estadoMasT = digitalRead(masT);
     estadoMenosT = digitalRead(menosT);
     
