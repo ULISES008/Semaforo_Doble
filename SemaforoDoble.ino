@@ -1,6 +1,11 @@
 //Code by Maldonado
 // C++ code
 
+//Modulo I2C para LCD 2x16:
+#include<Wire.h>
+#include <LiquidCrystal_I2C.h> // Debe descargar la Libreria que controla el I2C
+
+LiquidCrystal_I2C lcd(0x27,16,2);
 //Semaforo 1:
 int green1 = 8;
 int yellow1 = 9;
@@ -27,8 +32,21 @@ int masT = 5;
 
 void setup()
 {
+  //Activar Serial Monitor:
   Serial.begin(9600);
   
+  // initialize the lcd
+  lcd.init();                       
+  // Print a message to the LCD.
+  lcd.backlight();
+  lcd.setCursor(2,0);
+  lcd.print("Tiempo:");
+  lcd.setCursor(2,1);
+  lcd.print(t/1000);
+  lcd.print(" seg");
+  //delay(1000);
+  //lcd.noBacklight();
+
   //Semaforo 1:
   pinMode(green1, OUTPUT);
   pinMode(yellow1, OUTPUT);
@@ -84,27 +102,38 @@ void changeLights(){
 
 //Stop loop
 void stopAll(){
+
   digitalWrite(green1, LOW);
   digitalWrite(red1, HIGH);
   digitalWrite(yellow1, HIGH);
   digitalWrite(green2, LOW);
   digitalWrite(red2, HIGH);
   digitalWrite(yellow2, HIGH);
+  //lcd.clear();
+  //lcd.setCursor(2,0);
+  //lcd.print("Time:");
+  //lcd.setCursor(2,1);
+  //lcd.print("seg");
+  // clear the screen
+
   while (digitalRead(buttonOn) != HIGH){
     //Change time mode
     Serial.println(t);
+    //
+    //lcd.backlight();
 
     estadoMasT = digitalRead(masT);
     estadoMenosT = digitalRead(menosT);
     
     if ((estadoMasT == HIGH) && (estadoAnteriorMasT == LOW)){
-      if (t < 7000){            //Cambiat tiempo
+      if (t < 7000){            //Cambiat tiempo                                 
         t=t+1000;            //Cambiat tiempo
       }
       else{
         t=1000;            //Cambiat tiempo
       }
       delay(20);
+      lcdDisplay();
     }
     else if ((estadoMenosT == HIGH) && (estadoAnteriorMenosT == LOW)){
       if (t > 1000){            //Cambiat tiempo
@@ -128,4 +157,15 @@ void stopAll(){
   digitalWrite(green2, LOW);
   digitalWrite(red2, LOW);
   digitalWrite(yellow2, LOW);
+}
+
+void lcdDisplay(){
+  //lcd.init();                       
+  // Print a message to the LCD.
+  //lcd.backlight();
+  //lcd.setCursor(2,0);
+  //lcd.print("Tiempo:");
+  lcd.setCursor(2,1);
+  lcd.print(t/1000);
+  lcd.print(" seg");
 }
