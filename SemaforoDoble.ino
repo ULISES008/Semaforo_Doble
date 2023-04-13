@@ -29,6 +29,12 @@ int estadoAnteriorMenosT = 0;
 //+, -, time in sec:
 int menosT = 6;
 int masT = 5;
+//Estado de interrupcion:
+bool interrupted = false;
+
+unsigned long previousMillis = 0;
+
+int x=1;
 
 void setup()
 {
@@ -56,7 +62,7 @@ void setup()
   pinMode(yellow2, OUTPUT);
   pinMode(red2, OUTPUT);
   // switch:
-  attachInterrupt(digitalPinToInterrupt(buttonOff),stopAll,HIGH);
+  attachInterrupt(digitalPinToInterrupt(buttonOff),interrupt,HIGH);
   pinMode(buttonOn, INPUT);
   // switch time:
   pinMode(menosT, INPUT);
@@ -65,7 +71,12 @@ void setup()
 
 void loop()
 {
-  changeLights();
+  if (!interrupted){
+    changeLights2();
+  }
+  else if (interrupted){
+    stopAll();
+  }
 }
 
 void changeLights(){
@@ -73,7 +84,7 @@ void changeLights(){
   digitalWrite(yellow2, LOW);
   digitalWrite(red2, HIGH);
   delay(tRojoVerde);
-  
+
   //verde 1
   digitalWrite(red1, LOW);
   digitalWrite(green1, HIGH);
@@ -100,6 +111,63 @@ void changeLights(){
   delay(tPreventiva);
 }
 
+void changeLights2(){
+  //rojo 2
+  unsigned long currentMillis = millis();
+
+  if ((currentMillis - previousMillis >= tRojoVerde) && (x == 1)){
+    previousMillis = currentMillis;
+    digitalWrite(yellow2, LOW);
+    digitalWrite(red2, HIGH);
+    x=2;
+  }
+  //verde 1
+  else if ((currentMillis - previousMillis >= t) && (x == 2)){
+    previousMillis = currentMillis;
+    digitalWrite(red1, LOW);
+    digitalWrite(green1, HIGH);
+    x=3;
+  }
+  
+  //amarillo 1
+  else if ((currentMillis - previousMillis >= tPreventiva) && (x == 3)){
+    previousMillis = currentMillis;
+    digitalWrite(green1, LOW);
+    digitalWrite(yellow1, HIGH);
+    x=4;
+  }
+  
+  //rojo 1
+  else if ((currentMillis - previousMillis >= tRojoVerde) && (x == 4)){
+    previousMillis = currentMillis;
+    digitalWrite(yellow1, LOW);
+    digitalWrite(red1, HIGH);
+    x=5;
+  }
+  
+  //verde 2
+  else if ((currentMillis - previousMillis >= t) && (x == 5)){
+    previousMillis = currentMillis;
+    digitalWrite(red2, LOW);
+    digitalWrite(green2, HIGH);
+    x=6;
+  }
+  
+  //amarillo 2
+  else if ((currentMillis - previousMillis >= tPreventiva) && (x == 6)){
+    previousMillis = currentMillis;
+    digitalWrite(green2, LOW);
+    digitalWrite(yellow2, HIGH);
+    x=1;
+  }
+}
+
+//interrupt
+void interrupt(){
+  interrupted= true;
+  
+}
+
 //Stop loop
 void stopAll(){
 
@@ -109,18 +177,10 @@ void stopAll(){
   digitalWrite(green2, LOW);
   digitalWrite(red2, HIGH);
   digitalWrite(yellow2, HIGH);
-  //lcd.clear();
-  //lcd.setCursor(2,0);
-  //lcd.print("Time:");
-  //lcd.setCursor(2,1);
-  //lcd.print("seg");
-  // clear the screen
 
   while (digitalRead(buttonOn) != HIGH){
     //Change time mode
     Serial.println(t);
-    //
-    //lcd.backlight();
 
     estadoMasT = digitalRead(masT);
     estadoMenosT = digitalRead(menosT);
@@ -133,7 +193,8 @@ void stopAll(){
         t=1000;            //Cambiat tiempo
       }
       delay(20);
-      lcdDisplay();
+      lcd.setCursor(2,1);
+      lcd.print(t/1000);
     }
     else if ((estadoMenosT == HIGH) && (estadoAnteriorMenosT == LOW)){
       if (t > 1000){            //Cambiat tiempo
@@ -143,6 +204,8 @@ void stopAll(){
         t=7000;            //Cambiat tiempo
       }
       delay(20);
+      lcd.setCursor(2,1);
+      lcd.print(t/1000);
     }
     
     estadoAnteriorMasT = estadoMasT;
@@ -157,15 +220,6 @@ void stopAll(){
   digitalWrite(green2, LOW);
   digitalWrite(red2, LOW);
   digitalWrite(yellow2, LOW);
-}
-
-void lcdDisplay(){
-  //lcd.init();                       
-  // Print a message to the LCD.
-  //lcd.backlight();
-  //lcd.setCursor(2,0);
-  //lcd.print("Tiempo:");
-  lcd.setCursor(2,1);
-  lcd.print(t/1000);
-  lcd.print(" seg");
+  
+  interrupted= false;
 }
