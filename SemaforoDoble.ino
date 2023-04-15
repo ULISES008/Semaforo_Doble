@@ -65,8 +65,8 @@ void setup()
   pinMode(menosT, INPUT);
   pinMode(masT, INPUT);
   //Configuración inicial semaforos:
-  digitalWrite(yellow2, HIGH);
-  digitalWrite(red1, HIGH);
+  digitalWrite(yellow2, LOW);
+  digitalWrite(red1, LOW);
 }
 
 void loop()
@@ -84,44 +84,44 @@ void changeLights()
   unsigned long currentMillis = millis();
   //rojo 2
   if ((currentMillis - previousMillis >= tPreventiva) && (x == 1)){
-    previousMillis = millis();
-    digitalWrite(yellow2, LOW);
-    digitalWrite(red2, HIGH);
+    previousMillis = currentMillis;
+    digitalWrite(yellow2, HIGH);
+    digitalWrite(red2, LOW);
     x=2;
   }
   //verde 1
   else if ((currentMillis - previousMillis >= tRojoVerde) && (x == 2)){
-    previousMillis = millis();
-    digitalWrite(red1, LOW);
-    digitalWrite(green1, HIGH);
+    previousMillis = currentMillis;
+    digitalWrite(red1, HIGH);
+    digitalWrite(green1, LOW);
     x=3;
   }
   //amarillo 1
   else if ((currentMillis - previousMillis >= t) && (x == 3)){
-    previousMillis = millis();
-    digitalWrite(green1, LOW);
-    digitalWrite(yellow1, HIGH);
+    previousMillis = currentMillis;
+    digitalWrite(green1, HIGH);
+    digitalWrite(yellow1, LOW);
     x=4;
   }
   //rojo 1
   else if ((currentMillis - previousMillis >= tPreventiva) && (x == 4)){
-    previousMillis = millis();
-    digitalWrite(yellow1, LOW);
-    digitalWrite(red1, HIGH);
+    previousMillis = currentMillis;
+    digitalWrite(yellow1, HIGH);
+    digitalWrite(red1, LOW);
     x=5;
   }
   //verde 2
   else if ((currentMillis - previousMillis >= tRojoVerde) && (x == 5)){
-    previousMillis = millis();
-    digitalWrite(red2, LOW);
-    digitalWrite(green2, HIGH);
+    previousMillis = currentMillis;
+    digitalWrite(red2, HIGH);
+    digitalWrite(green2, LOW);
     x=6;
   }
   //amarillo 2
   else if ((currentMillis - previousMillis >= t) && (x == 6)){
-    previousMillis = millis();
-    digitalWrite(green2, LOW);
-    digitalWrite(yellow2, HIGH);
+    previousMillis = currentMillis;
+    digitalWrite(green2, HIGH);
+    digitalWrite(yellow2, LOW);
     x=1;
   }
 }
@@ -135,12 +135,12 @@ void interrupt()
 //Stop loop
 void stopAll()
 {
-  digitalWrite(green1, LOW);
-  digitalWrite(red1, HIGH);
-  digitalWrite(yellow1, HIGH);
-  digitalWrite(green2, LOW);
-  digitalWrite(red2, HIGH);
-  digitalWrite(yellow2, HIGH);
+  digitalWrite(green1, HIGH);
+  digitalWrite(red1, LOW);
+  digitalWrite(yellow1, LOW);
+  digitalWrite(green2, HIGH);
+  digitalWrite(red2, LOW);
+  digitalWrite(yellow2, LOW);
   //Ciclo mientras esta detenido el semaforo
   while (digitalRead(buttonOn) != HIGH){
     Serial.println(t);                                                     //Borrar
@@ -173,10 +173,10 @@ void stopAll()
     estadoAnteriorMenosT = estadoMenosT;
   }
   //Restaurar configuracion del semaforo y continuar el ciclo
-  digitalWrite(green1, LOW);
-  digitalWrite(yellow1, LOW);
-  digitalWrite(green2, LOW);
-  digitalWrite(red2, LOW);
+  digitalWrite(green1, HIGH);
+  digitalWrite(yellow1, HIGH);
+  digitalWrite(green2, HIGH);
+  digitalWrite(red2, HIGH);
   x=1;
   interrupted= false;
 }
