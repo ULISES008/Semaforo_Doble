@@ -1,6 +1,15 @@
-//Code by Maldonado
-// C++ code
+//Code by Grupo Rubber 
+//Contacto: 
+//https://gruporubber.com.mx/
+//+52 (55) 7657-3587 WhatsApp
+//+52 (55) 6381-3674
 
+
+//Modulo I2C para LCD 2x16:
+#include<Wire.h>
+#include <LiquidCrystal_I2C.h> // Debe descargar la Libreria que controla el I2C
+
+LiquidCrystal_I2C lcd(0x27,16,2);
 //Semaforo 1:
 int green1 = 8;
 int yellow1 = 9;
@@ -13,12 +22,57 @@ int red2 = 13;
 int buttonOff = 2;
 int buttonOn = 7;
 // Tiempos:
+long t= 180000;
+long tIntervalo = 60000;
+long tMax = 420000;
+long tMin = 60000;
+long tPreventiva = 5000;
+long tRojoVerde = 5000;
+//program time:
+int estadoMasT = 0;
+int estadoMenosT = 0;
+int estadoAnteriorMasT = 0;
+int estadoAnteriorMenosT = 0;
+//+, -, time in sec:
+int menosT = 5;
+int masT = 6;
+//Estado de interrupcion:
+bool interrupted = false;
+//Condicionales para intervalos entre semaforos:
+unsigned long previousMillis = millis();
+int x=1;
 int t = 3000;
 int tPreventiva = 2000;
 int tRojoVerde = 1000;
 
 void setup()
 {
+  // initialize the lcd
+  lcd.init();                       
+  // Print a message to the LCD.
+  lcd.backlight();
+  lcd.setCursor(2,0);
+  lcd.print("Bienvenido");                                                //NOTAS: Cambiar texto de inicio y apagar pantalla mientras no se usa
+  lcd.setCursor(2,1);
+  lcd.print("Iniciando...");
+  delay(3000);
+  lcd.clear();
+  // Iniciando todos apagados:
+  digitalWrite(green1, HIGH);
+  digitalWrite(green2, HIGH);
+  digitalWrite(yellow1, HIGH);
+  digitalWrite(yellow2, HIGH);
+  digitalWrite(red1, HIGH);
+  digitalWrite(red2, HIGH);
+  // Tiempo inicial
+  lcd.setCursor(2,0);
+  lcd.print("Tiempo:");
+  lcd.setCursor(2,1);
+  lcd.print(t/tIntervalo);
+  lcd.print(" min");
+  delay(3000);
+  lcd.noBacklight();
+
   //Semaforo 1:
   pinMode(green1, OUTPUT);
   pinMode(yellow1, OUTPUT);
@@ -28,49 +82,86 @@ void setup()
   pinMode(yellow2, OUTPUT);
   pinMode(red2, OUTPUT);
   // switch:
-  attachInterrupt(digitalPinToInterrupt(buttonOff),stopAll,HIGH);
+  attachInterrupt(digitalPinToInterrupt(buttonOff),interrupt,HIGH);
   pinMode(buttonOn, INPUT);
+  // switch time:
+  pinMode(menosT, INPUT);
+  pinMode(masT, INPUT);
+  //Configuración inicial semaforos:
+  digitalWrite(yellow2, LOW);
+  digitalWrite(red1, LOW);
 }
 
 void loop()
 {
-  changeLights();
-  
+  if (!interrupted){
+    lcd.noBacklight();
+    changeLights();
+  }
+  else if (interrupted){
+    stopAll();
+  }
 }
 
-void changeLights(){
+void changeLights()
+{
+  unsigned long currentMillis = millis();
   //rojo 2
-  digitalWrite(yellow2, LOW);
-  digitalWrite(red2, HIGH);
-  delay(tRojoVerde);
-  
+  if ((currentMillis - previousMillis >= tPreventiva) && (x == 1)){
+    previousMillis = currentMillis;
+    digitalWrite(yellow2, HIGH);
+    digitalWrite(red2, LOW);
+    x=2;
+  }
   //verde 1
-  digitalWrite(red1, LOW);
-  digitalWrite(green1, HIGH);
-  delay(t);
-  
+  else if ((currentMillis - previousMillis >= tRojoVerde) && (x == 2)){
+    previousMillis = currentMillis;
+    digitalWrite(red1, HIGH);
+    digitalWrite(green1, LOW);
+    x=3;
+  }
   //amarillo 1
-  digitalWrite(green1, LOW);
-  digitalWrite(yellow1, HIGH);
-  delay(tPreventiva);
-  
+  else if ((currentMillis - previousMillis >= t) && (x == 3)){
+    previousMillis = currentMillis;
+    digitalWrite(green1, HIGH);
+    digitalWrite(yellow1, LOW);
+    x=4;
+  }
   //rojo 1
-  digitalWrite(yellow1, LOW);
-  digitalWrite(red1, HIGH);
-  delay(tRojoVerde);
-  
+  else if ((currentMillis - previousMillis >= tPreventiva) && (x == 4)){
+    previousMillis = currentMillis;
+    digitalWrite(yellow1, HIGH);
+    digitalWrite(red1, LOW);
+    x=5;
+  }
   //verde 2
-  digitalWrite(red2, LOW);
-  digitalWrite(green2, HIGH);
-  delay(t);
-  
+  else if ((currentMillis - previousMillis >= tRojoVerde) && (x == 5)){
+    previousMillis = currentMillis;
+    digitalWrite(red2, HIGH);
+    digitalWrite(green2, LOW);
+    x=6;
+  }
   //amarillo 2
-  digitalWrite(green2, LOW);
-  digitalWrite(yellow2, HIGH);
-  delay(tPreventiva);
+  else if ((currentMillis - previousMillis >= t) && (x == 6)){
+    previousMillis = currentMillis;
+    digitalWrite(green2, HIGH);
+    digitalWrite(yellow2, LOW);
+    x=1;
+  }
+}
+
+//interrupt
+void interrupt()
+{
+  interrupted= true;
 }
 
 //Stop loop
+void stopAll()
+{
+  lcd.backlight();
+  digitalWrite(green1, HIGH);
+=======
 void stopAll(){
   digitalWrite(green1, LOW);
   digitalWrite(red1, HIGH);
@@ -83,7 +174,46 @@ void stopAll(){
   digitalWrite(green1, LOW);
   digitalWrite(red1, LOW);
   digitalWrite(yellow1, LOW);
-  digitalWrite(green2, LOW);
+  digitalWrite(green2, HIGH);
   digitalWrite(red2, LOW);
   digitalWrite(yellow2, LOW);
+  //Ciclo mientras esta detenido el semaforo
+  while (digitalRead(buttonOn) != HIGH){
+    //Change time mode
+    estadoMasT = digitalRead(masT);
+    estadoMenosT = digitalRead(menosT);
+    if ((estadoMasT == HIGH) && (estadoAnteriorMasT == LOW)){
+      if (t < tMax){                              
+        t=t+tIntervalo;
+      }
+      else{
+        t=tMin;
+      }
+      delay(20);
+      lcd.setCursor(2,1);
+      lcd.print(t/tIntervalo);
+      lcd.print(" min");
+    }
+    else if ((estadoMenosT == HIGH) && (estadoAnteriorMenosT == LOW)){
+      if (t > tMin){
+        t=t-tIntervalo;
+      }
+      else{
+        t=tMax;
+      }
+      delay(20);
+      lcd.setCursor(2,1);
+      lcd.print(t/tIntervalo);
+      lcd.print(" min");
+    }
+    estadoAnteriorMasT = estadoMasT;
+    estadoAnteriorMenosT = estadoMenosT;
+  }
+  //Restaurar configuracion del semaforo y continuar el ciclo
+  digitalWrite(green1, HIGH);
+  digitalWrite(yellow1, HIGH);
+  digitalWrite(green2, HIGH);
+  digitalWrite(red2, HIGH);
+  x=1;
+  interrupted= false;
 }
