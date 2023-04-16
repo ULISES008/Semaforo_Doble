@@ -49,7 +49,7 @@ void setup()
   // Print a message to the LCD.
   lcd.backlight();
   lcd.setCursor(2,0);
-  lcd.print("Bienvenido");                                                //NOTAS: Cambiar texto de inicio y apagar pantalla mientras no se usa
+  lcd.print("Bienvenido");
   lcd.setCursor(2,1);
   lcd.print("Iniciando...");
   delay(3000);
