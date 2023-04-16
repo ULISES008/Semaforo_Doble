@@ -1,5 +1,9 @@
-//Code by Maldonado
-// C++ code
+//Code by Grupo Rubber 
+//Contacto: 
+//https://gruporubber.com.mx/
+//+52 (55) 7657-3587 WhatsApp
+//+52 (55) 6381-3674
+
 
 //Modulo I2C para LCD 2x16:
 #include<Wire.h>
@@ -18,17 +22,20 @@ int red2 = 13;
 int buttonOff = 2;
 int buttonOn = 7;
 // Tiempos:
-int t = 3000;
-int tPreventiva = 2000;
-int tRojoVerde = 1000;
+long t= 180000;
+long tIntervalo = 60000;
+long tMax = 420000;
+long tMin = 60000;
+long tPreventiva = 5000;
+long tRojoVerde = 5000;
 //program time:
 int estadoMasT = 0;
 int estadoMenosT = 0;
 int estadoAnteriorMasT = 0;
 int estadoAnteriorMenosT = 0;
 //+, -, time in sec:
-int menosT = 6;
-int masT = 5;
+int menosT = 5;
+int masT = 6;
 //Estado de interrupcion:
 bool interrupted = false;
 //Condicionales para intervalos entre semaforos:
@@ -37,18 +44,31 @@ int x=1;
 
 void setup()
 {
-  //Activar Serial Monitor:
-  Serial.begin(9600);                 //borrar
-  
   // initialize the lcd
   lcd.init();                       
   // Print a message to the LCD.
   lcd.backlight();
   lcd.setCursor(2,0);
-  lcd.print("Tiempo:");                                                //NOTAS: Cambiar texto de inicio y apagar pantalla mientras no se usa
+  lcd.print("Bienvenido");                                                //NOTAS: Cambiar texto de inicio y apagar pantalla mientras no se usa
   lcd.setCursor(2,1);
-  lcd.print(t/1000);
-  lcd.print(" seg");
+  lcd.print("Iniciando...");
+  delay(3000);
+  lcd.clear();
+  // Iniciando todos apagados:
+  digitalWrite(green1, HIGH);
+  digitalWrite(green2, HIGH);
+  digitalWrite(yellow1, HIGH);
+  digitalWrite(yellow2, HIGH);
+  digitalWrite(red1, HIGH);
+  digitalWrite(red2, HIGH);
+  // Tiempo inicial
+  lcd.setCursor(2,0);
+  lcd.print("Tiempo:");
+  lcd.setCursor(2,1);
+  lcd.print(t/tIntervalo);
+  lcd.print(" min");
+  delay(3000);
+  lcd.noBacklight();
 
   //Semaforo 1:
   pinMode(green1, OUTPUT);
@@ -72,6 +92,7 @@ void setup()
 void loop()
 {
   if (!interrupted){
+    lcd.noBacklight();
     changeLights();
   }
   else if (interrupted){
@@ -135,6 +156,7 @@ void interrupt()
 //Stop loop
 void stopAll()
 {
+  lcd.backlight();
   digitalWrite(green1, HIGH);
   digitalWrite(red1, LOW);
   digitalWrite(yellow1, LOW);
@@ -143,31 +165,32 @@ void stopAll()
   digitalWrite(yellow2, LOW);
   //Ciclo mientras esta detenido el semaforo
   while (digitalRead(buttonOn) != HIGH){
-    Serial.println(t);                                                     //Borrar
     //Change time mode
     estadoMasT = digitalRead(masT);
     estadoMenosT = digitalRead(menosT);
     if ((estadoMasT == HIGH) && (estadoAnteriorMasT == LOW)){
-      if (t < 7000){                                                      //Cambiat tiempo                                 
-        t=t+1000;                                                            //Cambiat tiempo
+      if (t < tMax){                              
+        t=t+tIntervalo;
       }
       else{
-        t=1000;                                                            //Cambiat tiempo
+        t=tMin;
       }
       delay(20);
       lcd.setCursor(2,1);
-      lcd.print(t/1000);
+      lcd.print(t/tIntervalo);
+      lcd.print(" min");
     }
     else if ((estadoMenosT == HIGH) && (estadoAnteriorMenosT == LOW)){
-      if (t > 1000){            //Cambiat tiempo
-        t=t-1000;            //Cambiat tiempo
+      if (t > tMin){
+        t=t-tIntervalo;
       }
       else{
-        t=7000;            //Cambiat tiempo
+        t=tMax;
       }
       delay(20);
       lcd.setCursor(2,1);
-      lcd.print(t/1000);
+      lcd.print(t/tIntervalo);
+      lcd.print(" min");
     }
     estadoAnteriorMasT = estadoMasT;
     estadoAnteriorMenosT = estadoMenosT;
