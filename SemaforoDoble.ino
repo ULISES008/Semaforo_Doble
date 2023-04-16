@@ -41,6 +41,9 @@ bool interrupted = false;
 //Condicionales para intervalos entre semaforos:
 unsigned long previousMillis = millis();
 int x=1;
+int t = 3000;
+int tPreventiva = 2000;
+int tRojoVerde = 1000;
 
 void setup()
 {
@@ -158,6 +161,17 @@ void stopAll()
 {
   lcd.backlight();
   digitalWrite(green1, HIGH);
+=======
+void stopAll(){
+  digitalWrite(green1, LOW);
+  digitalWrite(red1, HIGH);
+  digitalWrite(yellow1, HIGH);
+  digitalWrite(green2, LOW);
+  digitalWrite(red2, HIGH);
+  digitalWrite(yellow2, HIGH);
+  while (digitalRead(buttonOn) != HIGH){
+  }
+  digitalWrite(green1, LOW);
   digitalWrite(red1, LOW);
   digitalWrite(yellow1, LOW);
   digitalWrite(green2, HIGH);
