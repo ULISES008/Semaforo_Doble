@@ -34,8 +34,8 @@ int buttonOn = 7;
 // Tiempos:
 long t= 60000;
 long tIntervalo = 30000;
-long tMax = 420000;
-long tMin = 60000;
+long tMax = 180000;
+long tMin = 30000;
 long tPreventiva = 5000;
 long tRojoVerde = 5000;
 //program time:
