@@ -32,8 +32,8 @@ int red2 = 13;
 int buttonOff = 2;
 int buttonOn = 7;
 // Tiempos:
-long t= 180000;
-long tIntervalo = 60000;
+long t= 60000;
+long tIntervalo = 30000;
 long tMax = 420000;
 long tMin = 60000;
 long tPreventiva = 5000;
@@ -80,7 +80,8 @@ void setup()
   lcd.setCursor(2,0);
   lcd.print("Tiempo:");
   lcd.setCursor(2,1);
-  lcd.print(t/tIntervalo);
+  lcd.print(t/60000);
+  lcd.print(":00");
   lcd.print(" min");
   delay(3000);
   //lcd.noBacklight();                                 //lcd para proteus no tiene esta funccion (editar)
@@ -191,9 +192,21 @@ void stopAll()
         t=tMin;
       }
       delay(20);
+
+
+      //////////////////////////////////////////////////////////////////////
       lcd.setCursor(2,1);
-      lcd.print(t/tIntervalo);
+      if (t%60000 == 0){
+        lcd.print(t/60000);
+        lcd.print(":00");
+      }
+      else{
+        lcd.print(t/60000);
+        lcd.print(":30");
+      }
       lcd.print(" min");
+      //////////////////////////////////////////////////////////////////////
+
     }
     else if ((estadoMenosT == HIGH) && (estadoAnteriorMenosT == LOW)){
       if (t > tMin){
@@ -203,9 +216,22 @@ void stopAll()
         t=tMax;
       }
       delay(20);
+
+
+      //////////////////////////////////////////////////////////////////////
       lcd.setCursor(2,1);
-      lcd.print(t/tIntervalo);
+      if (t%60000 == 0){
+        lcd.print(t/60000);
+        lcd.print(":00");
+      }
+      else{
+        lcd.print(t/60000);
+        lcd.print(":30");
+      }
       lcd.print(" min");
+
+
+      //////////////////////////////////////////////////////////////////////
     }
     estadoAnteriorMasT = estadoMasT;
     estadoAnteriorMenosT = estadoMenosT;
