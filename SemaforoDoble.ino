@@ -8,8 +8,8 @@
 //Modulo I2C para LCD 2x16:
 #include<Wire.h>
 #include <LiquidCrystal_I2C.h> // Debe descargar la Libreria que controla el I2C
-
 LiquidCrystal_I2C lcd(0x27,16,2);
+
 //Semaforo 1:
 int green1 = 8;
 int yellow1 = 9;
@@ -22,9 +22,9 @@ int red2 = 13;
 int buttonOff = 2;
 int buttonOn = 7;
 // Tiempos:
-long t= 180000;
-long tIntervalo = 60000;
-long tMax = 420000;
+long t= 60000;
+long tIntervalo = 30000;
+long tMax = 180000;
 long tMin = 60000;
 long tPreventiva = 5000;
 long tRojoVerde = 5000;
@@ -45,7 +45,8 @@ int x=1;
 void setup()
 {
   // initialize the lcd
-  lcd.init();                       
+  lcd.init();     
+
   // Print a message to the LCD.
   lcd.backlight();
   lcd.setCursor(2,0);
@@ -65,7 +66,8 @@ void setup()
   lcd.setCursor(2,0);
   lcd.print("Tiempo:");
   lcd.setCursor(2,1);
-  lcd.print(t/tIntervalo);
+  lcd.print(t/60000);
+  lcd.print(":00");
   lcd.print(" min");
   delay(3000);
   lcd.noBacklight();
@@ -92,7 +94,7 @@ void setup()
 void loop()
 {
   if (!interrupted){
-    lcd.noBacklight();
+    lcd.noBacklight(); 
     changeLights();
   }
   else if (interrupted){
@@ -177,7 +179,14 @@ void stopAll()
       }
       delay(20);
       lcd.setCursor(2,1);
-      lcd.print(t/tIntervalo);
+      if (t%60000 == 0){
+        lcd.print(t/60000);
+        lcd.print(":00");
+      }
+      else{
+        lcd.print(t/60000);
+        lcd.print(":30");
+      }
       lcd.print(" min");
     }
     else if ((estadoMenosT == HIGH) && (estadoAnteriorMenosT == LOW)){
@@ -189,7 +198,14 @@ void stopAll()
       }
       delay(20);
       lcd.setCursor(2,1);
-      lcd.print(t/tIntervalo);
+      if (t%60000 == 0){
+        lcd.print(t/60000);
+        lcd.print(":00");
+      }
+      else{
+        lcd.print(t/60000);
+        lcd.print(":30");
+      }
       lcd.print(" min");
     }
     estadoAnteriorMasT = estadoMasT;
