@@ -6,10 +6,20 @@
 
 
 //Modulo I2C para LCD 2x16:
-#include<Wire.h>
-#include <LiquidCrystal_I2C.h> // Debe descargar la Libreria que controla el I2C
+//#include<Wire.h>
+//#include <LiquidCrystal_I2C.h> // Debe descargar la Libreria que controla el I2C
 
-LiquidCrystal_I2C lcd(0x27,16,2);
+//LiquidCrystal_I2C lcd(0x27,16,2);
+
+
+//Modulo I2C para LCD 2x16 para proteus:
+#include <Wire.h>
+#include "DFRobot_LCD.h"
+  const int colorR = 255;
+  const int colorG = 0;
+  const int colorB = 0;
+DFRobot_LCD lcd(16,2);  //16 characters and 2 lines of show
+
 //Semaforo 1:
 int green1 = 8;
 int yellow1 = 9;
@@ -44,10 +54,15 @@ int x=1;
 
 void setup()
 {
+  // initialize the lcd proteus
+  lcd.init();
+  lcd.setRGB(colorR, colorG, colorB);//If the module is a monochrome screen, you need to shield it
+
   // initialize the lcd
-  lcd.init();                       
+  //lcd.init();     
+
   // Print a message to the LCD.
-  lcd.backlight();
+  //lcd.backlight();
   lcd.setCursor(2,0);
   lcd.print("Bienvenido");
   lcd.setCursor(2,1);
@@ -68,7 +83,7 @@ void setup()
   lcd.print(t/tIntervalo);
   lcd.print(" min");
   delay(3000);
-  lcd.noBacklight();
+  //lcd.noBacklight();                                 //lcd para proteus no tiene esta funccion (editar)
 
   //Semaforo 1:
   pinMode(green1, OUTPUT);
@@ -92,7 +107,7 @@ void setup()
 void loop()
 {
   if (!interrupted){
-    lcd.noBacklight();
+    //lcd.noBacklight();                                       //lcd proteus no tiene esta funcion 
     changeLights();
   }
   else if (interrupted){
@@ -156,7 +171,7 @@ void interrupt()
 //Stop loop
 void stopAll()
 {
-  lcd.backlight();
+  //lcd.backlight();                                      //proteus no tiene esta funcion 
   digitalWrite(green1, HIGH);
   digitalWrite(red1, LOW);
   digitalWrite(yellow1, LOW);
