@@ -26,7 +26,7 @@ long t= 60000;
 long tIntervalo = 30000;
 long tMax = 180000;
 long tMin = 60000;
-long tPreventiva = 5000;
+long tPreventiva = 15000;
 long tRojoVerde = 5000;
 //program time:
 int estadoMasT = 0;
