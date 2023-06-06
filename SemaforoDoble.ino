@@ -22,11 +22,11 @@ int red2 = 13;
 int buttonOff = 2;
 int buttonOn = 7;
 // Tiempos:
-long t= 60000;
+long t= 30000;
 long tIntervalo = 30000;
-long tMax = 180000;
-long tMin = 60000;
-long tPreventiva = 15000;
+long tMax = 30000;
+long tMin = 0;
+long tPreventiva = 45000;
 long tRojoVerde = 5000;
 //program time:
 int estadoMasT = 0;
