@@ -24,9 +24,9 @@ int buttonOn = 7;
 // Tiempos:
 long t= 30000;
 long tIntervalo = 30000;
-long tMax = 30000;
-long tMin = 0;
-long tPreventiva = 45000;
+long tMax = 180000;
+long tMin = 30000;
+long tPreventiva = 60000;
 long tRojoVerde = 5000;
 //program time:
 int estadoMasT = 0;
@@ -66,7 +66,7 @@ void setup()
   lcd.setCursor(2,0);
   lcd.print("Tiempo:");
   lcd.setCursor(2,1);
-  lcd.print(t/60000);
+  lcd.print(tPreventiva/60000);
   lcd.print(":00");
   lcd.print(" min");
   delay(3000);
@@ -171,39 +171,39 @@ void stopAll()
     estadoMasT = digitalRead(masT);
     estadoMenosT = digitalRead(menosT);
     if ((estadoMasT == HIGH) && (estadoAnteriorMasT == LOW)){
-      if (t < tMax){                              
-        t=t+tIntervalo;
+      if (tPreventiva < tMax){                              
+        tPreventiva=tPreventiva+tIntervalo;
       }
       else{
-        t=tMin;
+        tPreventiva=tMin;
       }
       delay(20);
       lcd.setCursor(2,1);
-      if (t%60000 == 0){
-        lcd.print(t/60000);
+      if (tPreventiva%60000 == 0){
+        lcd.print(tPreventiva/60000);
         lcd.print(":00");
       }
       else{
-        lcd.print(t/60000);
+        lcd.print(tPreventiva/60000);
         lcd.print(":30");
       }
       lcd.print(" min");
     }
     else if ((estadoMenosT == HIGH) && (estadoAnteriorMenosT == LOW)){
-      if (t > tMin){
-        t=t-tIntervalo;
+      if (tPreventiva > tMin){
+        tPreventiva=tPreventiva-tIntervalo;
       }
       else{
-        t=tMax;
+        tPreventiva=tMax;
       }
       delay(20);
       lcd.setCursor(2,1);
-      if (t%60000 == 0){
-        lcd.print(t/60000);
+      if (tPreventiva%60000 == 0){
+        lcd.print(tPreventiva/60000);
         lcd.print(":00");
       }
       else{
-        lcd.print(t/60000);
+        lcd.print(tPreventiva/60000);
         lcd.print(":30");
       }
       lcd.print(" min");
